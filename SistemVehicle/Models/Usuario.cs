@@ -15,7 +15,6 @@ namespace SistemVehicle.Models
         public string Tipo { get; private set; }
 
         public Usuario() { }
-        public Usuario(string email, string senha) { }
 
         public Usuario(string nome, DateTime dataNascimento, string telefone, string email, string senha)
         {
