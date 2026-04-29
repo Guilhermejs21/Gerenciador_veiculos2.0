@@ -1,10 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using SistemVehicle.Services;
 using SistemVehicle.Models;
-using SistemVehicle.Repository;
-using System.Security.Cryptography.X509Certificates; 
 
 namespace Program.SistemVehicle
 {
@@ -15,12 +12,15 @@ namespace Program.SistemVehicle
             var serviceUser = new UsuarioService();
             var serviceVeiculo = new VeiculoService();
 
-            Console.WriteLine("Bem-vindo ao Sistema de Gerenciamento de Veículos!");
-            Console.WriteLine("Digite a Operação!!");
+            Console.WriteLine("Bem-vindo ao Gerenciador de Veículos!");
+
             while (true)
             {
+                Console.WriteLine("\nO que deseja fazer?");
                 Console.WriteLine("1 - Cadastro \n2 - Login \n0 - Sair");
+
                 int op = int.Parse(Console.ReadLine());
+
                 switch (op)
                 {
                     case 1:
@@ -47,60 +47,105 @@ namespace Program.SistemVehicle
                             Email = cd_email,
                             Senha = cd_senha
                         };
+
                         serviceUser.Cadastrar_User(cd_usuario);
-
                         break;
-                    case 2:
 
+                    case 2:
                         Console.WriteLine("\nDigite o email:");
                         string l_email = Console.ReadLine();
 
-                        Console.WriteLine("Digite a senha:\n");
+                        Console.WriteLine("Digite a senha:");
                         string l_senha = Console.ReadLine();
 
                         var usuario = serviceUser.FazerLogin(l_email, l_senha);
 
-                        if (usuario != null)
-                        {
-                            Console.WriteLine($"Bem-vindo, {usuario.Nome}!");
-                            Console.WriteLine("Cadastre seu veiculo.\n");
-
-                            Console.WriteLine("Marca:");
-                            string cd_marca = Console.ReadLine();
-
-                            Console.WriteLine("Modelo:");
-                            string cd_modelo = Console.ReadLine();
-
-                            Console.WriteLine("Ano:");
-                            int cd_ano = int.Parse(Console.ReadLine());
-
-                            Console.WriteLine("Tipo:");
-                            string cd_tipo = (Console.ReadLine());
-
-                            var cd_veiculo = new Veiculo
-                            {
-                                Marca = cd_marca,
-                                Modelo = cd_modelo,
-                                Ano = cd_ano,
-                                Tipo = cd_tipo,
-                                UsuarioId = 2004
-                            };
-                            serviceVeiculo.Cadastrar_Veiculo(cd_veiculo);
-
-                        }
-                        else
+                        if (usuario == null)
                         {
                             Console.WriteLine("Email ou senha inválidos.");
+                            break;
                         }
-                        break;
+
+                        Console.WriteLine($"Bem-vindo, {usuario.Nome}!");
+
+                        while (true)
+                        {
+                            Console.WriteLine("\n1 - Ver dados\n2 - Cadastrar\n3 - Buscar Veiculo\n5 - Atualizar multas\n0 - Sair");
+
+                            int opcao = int.Parse(Console.ReadLine());
+
+                            switch (opcao)
+                            {
+                                case 1:
+                                    Console.WriteLine($"\nNome: {usuario.Nome}");
+                                    Console.WriteLine($"Email: {usuario.Email}");
+                                    Console.WriteLine($"Telefone: {usuario.Telefone}");
+                                    Console.WriteLine($"Data de nascimento: {usuario.DataNascimento.ToShortDateString()}\n'");
+                                    break;
+                                case 2:
+                                    Console.WriteLine("\nTipo de veículo:");
+                                    Console.WriteLine("1 - Carro\n2 - Moto");
+
+                                    int tipo = int.Parse(Console.ReadLine());
+
+                                    Console.WriteLine("Marca:");
+                                    string marca = Console.ReadLine();
+
+                                    Console.WriteLine("Modelo:");
+                                    string modelo = Console.ReadLine();
+
+                                    Console.WriteLine("Ano:");
+                                    int ano = int.Parse(Console.ReadLine());
+
+                                    var veiculo = new Veiculo
+                                    {
+                                        Marca = marca,
+                                        Modelo = modelo,
+                                        Ano = ano,
+                                        Tipo = tipo == 1 ? "Carro" : "Moto",
+                                        UsuarioId = usuario.Id
+                                    };
+
+                                    serviceVeiculo.Cadastrar_Veiculo(veiculo);
+
+                                    Console.WriteLine("Veículo cadastrado!");
+                                    break;
+                                case 3:
+                                    Console.WriteLine("\nDigite o ID do veículo:");
+                                    int id = int.Parse(Console.ReadLine());
+                                    var veiculoEncontrado = serviceVeiculo.Buscar_Veiculo(id);
+                                    if (veiculoEncontrado == null)
+                                    {
+                                        Console.WriteLine("Veículo não encontrado.");
+                                        break;
+                                    }
+                                    Console.WriteLine($"\nID: {veiculoEncontrado.Id}");
+                                    Console.WriteLine($"Marca: {veiculoEncontrado.Marca}");
+                                    Console.WriteLine($"Modelo: {veiculoEncontrado.Modelo}");
+                                    Console.WriteLine($"Ano: {veiculoEncontrado.Ano}");
+                                    Console.WriteLine($"Tipo: {veiculoEncontrado.Tipo}");
+                                    Console.WriteLine($"Multas: {veiculoEncontrado.Multas}\n");
+                                    break;
+
+                                case 0:
+                                    goto MENU_PRINCIPAL;
+
+                                default:
+                                    Console.WriteLine("Opção inválida");
+                                    break;
+                            }
+                        }
+
                     case 0:
-                        break;
+                        return;
 
                     default:
-                        Console.WriteLine("Opção inválida! Digite novamente.");
+                        Console.WriteLine("Opção inválida!");
                         break;
                 }
+
+            MENU_PRINCIPAL:;
             }
         }
-    }  
+    }
 }
