@@ -32,6 +32,6 @@ namespace SistemVehicle.Repository
                 }
             }
         }
-        public 
+        
     }
 }
